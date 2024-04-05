@@ -15,21 +15,24 @@ namespace Miller_RabinWithBigInt
         /// Сама генерация происходит с помощью встроенного класса
         /// Затем соединяем куски через логическое И и сдвиги
         /// </summary> 
+        /// <param name="random">Экземпляр класса Random</param>
+        /// <param name="minValue">Первое значение диапазона (начало)</param>
+        /// <param name="maxValue">Второе значение диапазона (конец)</param>
+        /// <returns>Сгенерированное большое число</returns>
         public static BigInteger NextBigInteger(Random random, BigInteger minValue, BigInteger maxValue)
         {
             if (minValue > maxValue) throw new ArgumentException();
             if (minValue == maxValue) return minValue;
-            BigInteger zeroBasedUpperBound = maxValue - 1 - minValue; // Inclusive
+            BigInteger zeroBasedUpperBound = maxValue - 1 - minValue; 
             Debug.Assert(zeroBasedUpperBound.Sign >= 0);
             byte[] bytes = zeroBasedUpperBound.ToByteArray();
             Debug.Assert(bytes.Length > 0);
             Debug.Assert((bytes[bytes.Length - 1] & 0b10000000) == 0);
 
-            // Search for the most significant non-zero bit
             byte lastByteMask = 0b11111111;
             for (byte mask = 0b10000000; mask > 0; mask >>= 1, lastByteMask >>= 1)
             {
-                if ((bytes[bytes.Length - 1] & mask) == mask) break; // We found it
+                if ((bytes[bytes.Length - 1] & mask) == mask) break;
             }
 
             while (true)
@@ -46,6 +49,12 @@ namespace Miller_RabinWithBigInt
         public static List<BigInteger> primeNumbers = new();
         public static List<int> iterationCounts = new();
 
+        /// <summary>
+        /// Тест Миллера-Рабина
+        /// </summary>
+        /// <param name="n">нечётное число, проверяемое на простоту</param>
+        /// <param name="t">параметр надёжности (количество итераций для одного числа)</param>
+        /// <returns>n вероятно простое ИЛИ n точно составное</returns>
         public static string MillerRabinTest(BigInteger n, int t)
         {
             int tCopy = t;
@@ -66,12 +75,6 @@ namespace Miller_RabinWithBigInt
                 r = 1;
                 s = Convert.ToInt32(Math.Log2((double)nCopy));
             }
-
-            //Console.WriteLine($"r = {r}");
-            //Console.WriteLine("Вероятность ошибки = " + e.ToString());
-            //Console.WriteLine($"t = {t}");
-            //Console.WriteLine($"a = {a}");
-            //Console.WriteLine($"s = {s}");
 
             int iterCount = 1;
             int countUnits = 0;
@@ -114,11 +117,6 @@ namespace Miller_RabinWithBigInt
 
                 t--;
             }
-            //Console.WriteLine("Количество перебранных чисел до получения простого: " + iterCount);
-            //Console.WriteLine($"n = {n}");
-
-
-            //countPrimeNumbers++;
 
             if (primeNumbers.Count < 10)
                 primeNumbers.Add(n);
